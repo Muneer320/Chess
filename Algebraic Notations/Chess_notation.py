@@ -7,30 +7,26 @@ pygame.init()
 board = chess.Board()
 
 # Constants for window dimensions and colors
-WIDTH, HEIGHT = 600, 750  # Larger window size
-BOARD_SIZE = 512  # Chess board size
-MARGIN = (WIDTH - BOARD_SIZE) // 2  # To center the board horizontally
-TITLE_HEIGHT = 50  # Space for title
-MOVE_HEIGHT = 180  # Space for move list at the bottom
+WIDTH, HEIGHT = 600, 750
+BOARD_SIZE = 512
+MARGIN = (WIDTH - BOARD_SIZE) // 2
+TITLE_HEIGHT = 50
+MOVE_HEIGHT = 180
 
 SQ_SIZE = BOARD_SIZE // 8
-LIGHT_BLUE = (173, 216, 230)  # Light blue for light squares
-DARK_BLUE = (70, 130, 180)    # Steel blue for dark squares
-HIGHLIGHT_COLOR = (255, 255, 0)  # Yellow highlight for selected square
+LIGHT_BLUE = (173, 216, 230)
+DARK_BLUE = (70, 130, 180)
+HIGHLIGHT_COLOR = (255, 255, 0)
 
 # UI colors
-BACKGROUND_COLOR = (50, 50, 70)  # Dark background
-ALTERNATE_MOVE_COLORS = [(230, 230, 255), (210, 230, 255)]  # Alternating colors for move list
-
-# Colors for moves
-WHITE_MOVE_COLOR = (25, 53, 73)  # Black text for white moves
-BLACK_MOVE_COLOR = (38, 44, 58)  # White text for black moves
+BACKGROUND_COLOR = (50, 50, 70)
+ALTERNATE_MOVE_COLORS = [(230, 230, 255), (210, 230, 255)]
+WHITE_MOVE_COLOR = (25, 53, 73)
+BLACK_MOVE_COLOR = (38, 44, 58)
 
 # Load chess piece images
-pieces = {}
-for piece in ['p', 'r', 'n', 'b', 'q', 'k']:
-    pieces[f'w_{piece}'] = pygame.image.load(f'pieces/w_{piece}.png')
-    pieces[f'b_{piece}'] = pygame.image.load(f'pieces/b_{piece}.png')
+pieces = {f'{color}_{piece}': pygame.image.load(f'pieces/{color}_{piece}.png') for color in ['w', 'b'] for piece in ['p', 'r', 'n', 'b', 'q', 'k']}
+
 
 # Create screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -48,8 +44,8 @@ input_box = pygame.Rect((WIDTH//2) - 200, 625, 400, 50)
 input_text = ''
 
 
-move_list = []  # List to store moves (white on left, black on right)
-scroll_offset = 0  # Offset for scrolling moves
+move_list = []
+scroll_offset = 0
 
 def draw_board(selected_square=None):
     """Draw the chessboard with a possible highlighted square."""
@@ -109,30 +105,35 @@ running = True
 
 # Main loop
 while running:
-    screen.fill(BACKGROUND_COLOR)  # Fill background with custom dark color
-    draw_title()  # Draw title at the top
-    draw_board(selected_square)  # Draw the chess board and possibly highlight a square
-    draw_pieces()  # Draw pieces on the board
+    screen.fill(BACKGROUND_COLOR)
+    draw_title()
+    draw_board(selected_square)
+    draw_pieces()
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    if board.is_game_over():
+        game_over_message = "Game Over: " + board.result()
+        font = pygame.font.SysFont(None, 55)
+        text = font.render(game_over_message, True, (255, 0, 0))
+        screen.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - text.get_height() // 2))
+    else:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    try:
+                        move = board.parse_san(input_text)
+                        if move in board.legal_moves:
+                            board.push(move)
+                            input_text = ''
+                    except ValueError:
+                        print("Invalid move")
+                elif event.key == pygame.K_BACKSPACE:
+                    input_text = input_text[:-1]
+                else:
+                    input_text += event.unicode
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
-                move = chess.Move.from_uci(input_text)
-                if move in board.legal_moves:
-                    print(move)
-                    print(board.san(move)) 
-                    board.push_san(board.san(move))  # Push the move to the board
-                    input_text = ''
-                
-            elif event.key == pygame.K_BACKSPACE:
-                input_text = input_text[:-1]
-            else:
-                input_text += event.unicode
-          
     pygame.display.flip()
 
 pygame.quit()

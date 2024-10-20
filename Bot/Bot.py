@@ -20,8 +20,7 @@ BOT_HIGHLIGHT_COLOR = (255, 0, 0)
 BACKGROUND_COLOR = (48, 46, 43)
 
 # Load chess piece images
-pieces = {f'{color}_{piece}': pygame.image.load(f'pieces/{color}_{piece}.png')
-          for color in ['w', 'b'] for piece in ['p', 'r', 'n', 'b', 'q', 'k']}
+pieces = {f'{color}_{piece}': pygame.image.load(f'pieces/{color}_{piece}.png') for color in ['w', 'b'] for piece in ['p', 'r', 'n', 'b', 'q', 'k']}
 
 # Create screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
