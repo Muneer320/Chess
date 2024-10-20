@@ -118,27 +118,6 @@ def check_game_over():
         return "Draw by Variant!"
     return None
 
-# Main bot logic
-def bot_move(mode):
-    moves = list(board.legal_moves)
-    
-    if mode == 'easy':
-        return random.choice(moves) if moves else None
-    elif mode == 'medium':
-        captures = [move for move in moves if board.is_capture(move)]
-        if captures:
-            piece_values = {chess.PAWN: 1, chess.KNIGHT: 3,
-                            chess.BISHOP: 3, chess.ROOK: 5, chess.QUEEN: 9, chess.KING: 0}
-            captures_by_value = {}
-            for capture in captures:
-                value = piece_values[board.piece_at(
-                    capture.to_square).piece_type]
-                captures_by_value.setdefault(value, []).append(capture)
-            best_captures = captures_by_value[max(captures_by_value.keys())]
-            return random.choice(best_captures)
-        return random.choice(moves)
-    return None
-
 
 def draw_mode_selection():
     screen.fill(BACKGROUND_COLOR)
@@ -211,6 +190,37 @@ def draw_confirmation_box():
     screen.blit(yes_surface, confirm_restart_rect)
     screen.blit(no_surface, cancel_restart_rect)
     return confirm_restart_rect, cancel_restart_rect
+
+
+''' 
+Main bot logic
+
+The bot has two difficulty levels: 'easy' and 'medium' [for now].
+- In 'easy' mode, the bot makes a random legal move.
+- In 'medium' mode, the bot prioritizes capturing moves. 
+  - If there are capturing moves available, it selects the capture with the highest piece value.
+  - If no capturing moves are available, it makes a random legal move.
+
+'''
+def bot_move(mode):
+    moves = list(board.legal_moves)
+    
+    if mode == 'easy':
+        return random.choice(moves) if moves else None
+    elif mode == 'medium':
+        captures = [move for move in moves if board.is_capture(move)]
+        if captures:
+            piece_values = {chess.PAWN: 1, chess.KNIGHT: 3,
+                            chess.BISHOP: 3, chess.ROOK: 5, chess.QUEEN: 9, chess.KING: 0}
+            captures_by_value = {}
+            for capture in captures:
+                value = piece_values[board.piece_at(
+                    capture.to_square).piece_type]
+                captures_by_value.setdefault(value, []).append(capture)
+            best_captures = captures_by_value[max(captures_by_value.keys())]
+            return random.choice(best_captures)
+        return random.choice(moves)
+    return None
 
 
 while running:
