@@ -102,7 +102,10 @@ def pawn_promotion():
 
 def check_game_over():
     if board.is_checkmate():
-        return "Checkmate! Bot Wins!" if board.turn else "Checkmate! You Win!"
+        if game_mode == "pvp":
+            return "Checkmate! Black Wins!" if board.turn else "Checkmate! White Wins!"
+        else:
+            return "Checkmate! Bot Wins!" if board.turn else "Checkmate! You Win!"
     elif board.is_stalemate():
         return "Stalemate! It's a Draw!"
     elif board.is_insufficient_material():
