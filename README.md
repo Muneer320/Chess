@@ -1,60 +1,62 @@
-# Chess Project
+# Chess
 
-This project is a chess application that includes a graphical user interface, a bot for playing chess, and various utilities for handling algebraic notations.
+A desktop chess game in Python and pygame. You can play against another person on the same machine, or against a bot with three difficulty levels.
 
-## Project Structure
-- **Algebraic Notations/** 
-  - Chess_notation.py 
-  - Chess_tkinter.py 
-  - Chess.py 
-- **Bot/** 
-  - Bot.py 
-  - test.py 
-- pieces/ 
-- README.md
+The rules (castling, en passant, promotion, check, checkmate, stalemate, insufficient material, repetition and the 50/75-move rules) come from [`python-chess`](https://python-chess.readthedocs.io/). This project handles the board UI and the bot.
 
-### Algebraic Notations
+## Run it
 
-- **Chess_notation.py**: You play the game by entering the notations not by physically moving the pieces.
-- **Chess_tkinter.py**: Provides a Tkinter-based GUI for the chess game. [Primitive version has lots of bbugs, this was the first version I made a long years ago]
-- **Chess.py**: Another chess with pygame GUI that I made recently.
-
-### Bot
-
-- **Bot.py**: Implements a chess bot that can play against a human or another bot.
-
-### Pieces
-
-This directory contains all the chess pieces.
-
-## Getting Started
-
-### Prerequisites
-
-- Python 3.x
-- Pygame module
-- Tkinter (for the GUI)
-
-### Installation
-
-1. Clone the repository:
-    ```sh
-    git clone <repository-url>
-    ```
-2. Navigate to the project directory:
-    ```sh
-    cd <project-directory>
-    ```
-
-#### Running the Application
-
-To start the chess application with the GUI, run:
 ```sh
-python Bot\Bot.py
+pip install -r requirements.txt
+python Bot/Bot.py
 ```
 
-## Contributing
-Contributions are welcome! Please fork the repository and submit a pull request.
+It works from any directory, since piece images are loaded relative to the script.
+
+## Features
+
+- **Player vs Player** or **Player vs Bot**. You play White against the bot.
+- **Bot difficulties:**
+
+  | Level | How it picks a move |
+  |---|---|
+  | Easy | A random legal move |
+  | Medium | The most valuable capture available, otherwise a random move |
+  | Hard | A 3-ply alpha-beta search over material and simple positional terms (centre control, pawn advancement). It finds short mates and doesn't hang pieces carelessly. It replies in well under a second. |
+
+- The bot's last move is highlighted.
+- **Promotion picker:** choose queen, rook, bishop or knight.
+- **Draws:** threefold repetition and the fifty-move rule are claimed automatically.
+- Clicking another of your own pieces switches the selection.
+- Restart with confirmation.
+
+## Project layout
+
+| Path | What it is |
+|---|---|
+| `Bot/Bot.py` | The game: pygame UI and input handling |
+| `Bot/engine.py` | Move selection for each difficulty, plus the game-over messages |
+| `tests/test_engine.py` | Tests for the engine (legal moves, mate-in-one, captures, draw claims, speed) |
+| `pieces/` | Piece images |
+| `legacy/` | Earlier experiments, kept for reference (see below) |
+
+## Tests
+
+```sh
+pip install pytest
+python -m pytest tests
+```
+
+## Legacy scripts
+
+`legacy/` contains earlier versions. They are not maintained:
+
+- `Chess_tkinter.py`: my first chess program, a Tkinter GUI. It has known bugs.
+- `Chess_notation.py`: you play by typing algebraic notation instead of clicking pieces.
+- `Chess.py`: a pygame version that was meant to show a move list in algebraic notation. The move list doesn't work correctly.
+
+These scripts load images from `pieces/`, so run them from the repository root, e.g. `python legacy/Chess_notation.py`.
 
 ## License
-This project is licensed under the MIT License.
+
+MIT, see [LICENSE](LICENSE).
